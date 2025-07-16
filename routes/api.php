@@ -11,10 +11,8 @@ use App\Http\Controllers\Api\V1\OrderController;
 // Authentication routes
 Route::post('v1/register', [AuthController::class, 'register']);
 Route::post('v1/login', [AuthController::class, 'login']);
+Route::post('v1/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
 Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     // Products Routes
