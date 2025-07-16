@@ -63,4 +63,21 @@ class User extends Authenticatable
     {
         return $this->belongsTo(User::class, 'employee_id');
     }
+
+    public function scopeFilter($query, $params)
+    {
+        if (!empty($params['search'])) {
+            $query->where(function ($q) use ($params) {
+                $q->where('name', 'like', '%' . $params['search'] . '%')
+                  ->orWhere('email', 'like', '%' . $params['search'] . '%');
+            });
+        }
+        if (!empty($params['role'])) {
+            $query->where('role', $params['role']);
+        }
+        if (!empty($params['email'])) {
+            $query->where('email', $params['email']);
+        }
+        return $query;
+    }
 }

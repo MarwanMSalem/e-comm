@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\OrderController;
+use App\Http\Controllers\Api\V1\UserController;
 
 // API Routes
 
@@ -29,4 +30,9 @@ Route::middleware('auth:sanctum')->prefix('v1')->group(function () {
     Route::post('orders', [OrderController::class, 'store']);
     Route::put('orders/{order}', [OrderController::class, 'update']);
     Route::delete('orders/{order}', [OrderController::class, 'destroy']);
+
+    // Users Routes
+    Route::get('users', [UserController::class, 'index']);
+    Route::get('users/{id}', [UserController::class, 'show']);
+    Route::put('users/{user}', [UserController::class, 'update']);
 });
