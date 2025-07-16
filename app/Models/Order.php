@@ -16,6 +16,7 @@ class Order extends Model
         'status',
         'employee_id',
         'is_assigned',
+        'quantity', 
     ];
 
     public function scopeFilter($query, $params)

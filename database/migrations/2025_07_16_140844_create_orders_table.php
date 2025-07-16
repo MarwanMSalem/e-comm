@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->date('date');
+            $table->integer('quantity')->default(1);
             $table->enum('status', ['pending', 'shipped', 'delivered'])->default('pending');
             $table->foreignId('employee_id')->nullable()->constrained('users')->onDelete('set null');
             $table->boolean('is_assigned')->default(false);
