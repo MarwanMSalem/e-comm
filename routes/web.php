@@ -41,3 +41,11 @@ Route::get('/home', function () {
 })->name('home')->middleware('auth:sanctum');
 
 // (Optional) Other web routes for orders/users can be added here, following the same pattern.
+
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('orders', [WebOrderController::class, 'index'])->name('orders.index');
+    Route::get('orders/{order}/edit', [WebOrderController::class, 'edit'])->name('orders.edit');
+    Route::put('orders/{order}', [WebOrderController::class, 'update'])->name('orders.update');
+    Route::delete('orders/{order}', [WebOrderController::class, 'destroy'])->name('orders.destroy');
+    // ... other order routes as needed ...
+});

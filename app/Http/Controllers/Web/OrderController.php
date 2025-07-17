@@ -19,8 +19,27 @@ class OrderController extends Controller
 
     public function index(Request $request)
     {
-        $orders = $this->service->getAll($request->query());
-        return response()->json($orders);
+        $user = auth()->user();
+        $params = $request->query();
+
+        if ($user->role === 'admin') {
+            // Admin sees all orders
+            $orders = $this->service->getAll($params);
+            // Get all employees for the assign modal
+            $employees = \App\Models\User::where('role', 'employee')->get();
+        } elseif ($user->role === 'employee') {
+            // Employee sees only assigned orders
+            $params['employee_id'] = $user->id;
+            $orders = $this->service->getAll($params);
+            $employees = collect(); // empty
+        } else {
+            // User sees only their orders
+            $params['user_id'] = $user->id;
+            $orders = $this->service->getAll($params);
+            $employees = collect(); // empty
+        }
+
+        return view('order.index', compact('orders', 'employees'));
     }
 
     public function myOrders(Request $request)
