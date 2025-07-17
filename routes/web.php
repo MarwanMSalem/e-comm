@@ -12,20 +12,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Show register form
+// Register and login routes
 Route::get('web/register', function () {
     return view('auth.register');
 })->name('web.register');
 
-// Show login form
 Route::get('web/login', function () {
     return view('auth.login');
 })->name('web.login');
 
 // Authentication routes
-Route::post('web/register', [WebAuthController::class, 'register']);
-Route::post('web/login', [WebAuthController::class, 'login']);
-Route::post('web/logout', [WebAuthController::class, 'logout'])->middleware('auth:sanctum');
+// Route::post('web/register', [WebAuthController::class, 'register']);
+// Route::post('web/login', [WebAuthController::class, 'login']);
+// Route::post('web/logout', [WebAuthController::class, 'logout'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->prefix('web')->group(function () {
     // Products
