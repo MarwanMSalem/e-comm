@@ -40,7 +40,6 @@ Route::get('/home', function () {
     return view('home');
 })->name('home')->middleware('auth:sanctum');
 
-// (Optional) Other web routes for orders/users can be added here, following the same pattern.
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('orders', [WebOrderController::class, 'index'])->name('orders.index');
