@@ -50,6 +50,9 @@
                     @if(auth()->check() && auth()->user()->role === 'admin')
                         <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ $product->id }}">Edit</button>
                     @endif
+                    @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'user'))
+                        <button class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#orderModal{{ $product->id }}">Order</button>
+                    @endif
                 </td>
             </tr>
             <!-- View Modal (place after the row, not inside <tr>) -->
@@ -115,6 +118,35 @@
             </div>
             @endif
             @endauth
+
+            @if(auth()->check() && (auth()->user()->role === 'admin' || auth()->user()->role === 'user'))
+            <div class="modal fade" id="orderModal{{ $product->id }}" tabindex="-1" aria-labelledby="orderModalLabel{{ $product->id }}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <form method="POST" action="{{ route('orders.store.from_product', $product) }}">
+                        @csrf
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="orderModalLabel{{ $product->id }}">Place Order for {{ $product->name }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Available Quantity: {{ $product->quantity }}</label>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Quantity</label>
+                                    <input type="number" name="quantity" class="form-control" min="1" max="{{ $product->quantity }}" required>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Place Order</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            @endif
 
             @empty
             <tr>

@@ -7,6 +7,7 @@ use App\Http\Requests\OrderRequest;
 use App\Services\OrderService;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log; // Add at the top
 
 class OrderController extends Controller
 {
@@ -111,5 +112,33 @@ class OrderController extends Controller
             : collect();
 
         return view('order.edit', compact('order', 'employees'));
+    }
+
+    public function storeFromProduct(Request $request, \App\Models\Product $product)
+    {
+        $user = auth()->user();
+        if (!in_array($user->role, ['admin', 'user'])) {
+            abort(403, 'Unauthorized');
+        }
+
+        $request->validate([
+            'quantity' => 'required|integer|min:1|max:' . $product->quantity,
+        ]);
+
+        try {
+            $orderData = [
+                'user_id' => $user->id,
+                'product_id' => $product->id,
+                'date' => now()->toDateString(),
+                'quantity' => $request->input('quantity'),
+                'status' => 'pending',
+                'is_assigned' => false,
+            ];
+            $this->service->create($orderData);
+            return redirect()->route('products.index')->with('success', 'Order placed successfully!');
+        } catch (\Exception $e) {
+            Log::error('Order placement failed', ['error' => $e->getMessage()]);
+            return back()->withErrors(['quantity' => $e->getMessage()])->withInput();
+        }
     }
 }

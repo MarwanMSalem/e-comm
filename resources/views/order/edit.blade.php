@@ -19,12 +19,34 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Status</label>
-                    <input type="text" class="form-control" value="{{ ucfirst($order->status) }}" readonly>
+                    @if(auth()->user()->role === 'admin')
+                        <select name="status" class="form-select" required>
+                            <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Shipped</option>
+                            <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
+                        </select>
+                    @else
+                        <input type="text" class="form-control" value="{{ ucfirst($order->status) }}" readonly>
+                    @endif
                 </div>
+                @if(auth()->user()->role === 'admin')
+                <div class="mb-3">
+                    <label class="form-label">Assigned Employee</label>
+                    <select name="employee_id" class="form-select">
+                        <option value="">Select Employee</option>
+                        @foreach($employees as $employee)
+                            <option value="{{ $employee->id }}" {{ $order->employee_id == $employee->id ? 'selected' : '' }}>
+                                {{ $employee->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                @else
                 <div class="mb-3">
                     <label class="form-label">Assigned Employee</label>
                     <input type="text" class="form-control" value="{{ $order->employee ? $order->employee->name : '-' }}" readonly>
                 </div>
+                @endif
                 <div class="mb-3">
                     <label class="form-label">Quantity</label>
                     <input type="number" name="quantity" class="form-control" value="{{ old('quantity', $order->quantity) }}" min="1" required>

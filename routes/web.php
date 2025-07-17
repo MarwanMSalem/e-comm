@@ -47,5 +47,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('orders/{order}/edit', [WebOrderController::class, 'edit'])->name('orders.edit');
     Route::put('orders/{order}', [WebOrderController::class, 'update'])->name('orders.update');
     Route::delete('orders/{order}', [WebOrderController::class, 'destroy'])->name('orders.destroy');
+    Route::post('products/{product}/order', [\App\Http\Controllers\Web\OrderController::class, 'storeFromProduct'])->name('orders.store.from_product');
     // ... other order routes as needed ...
 });

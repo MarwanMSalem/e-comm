@@ -89,7 +89,7 @@
                         @method('PUT')
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="assignModalLabel{{ $order->id }}">Assign Employee</h5>
+                                <h5 class="modal-title" id="assignModalLabel{{ $order->id }}">Assign Employee & Update Status</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div class="modal-body">
@@ -104,11 +104,19 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="mb-3">
+                                    <label class="form-label">Status</label>
+                                    <select name="status" class="form-select" required>
+                                        <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="shipped" {{ $order->status == 'shipped' ? 'selected' : '' }}>Shipped</option>
+                                        <option value="delivered" {{ $order->status == 'delivered' ? 'selected' : '' }}>Delivered</option>
+                                    </select>
+                                </div>
                                 <input type="hidden" name="is_assigned" value="1">
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                <button type="submit" class="btn btn-primary">Assign</button>
+                                <button type="submit" class="btn btn-primary">Assign & Update</button>
                             </div>
                         </div>
                     </form>
