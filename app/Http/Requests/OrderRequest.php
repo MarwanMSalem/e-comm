@@ -10,23 +10,19 @@ class OrderRequest extends FormRequest
     public function authorize()
     {
         $user = auth()->user();
-        $order = $this->route('order'); // This will be the Order model instance
+        $order = $this->route('order');
 
         if ($this->isMethod('post')) {
             return $user !== null;
         }
 
         if ($this->isMethod('put') || $this->isMethod('patch')) {
-            // Admin can update any order
             if ($user && $user->role === 'admin') {
                 return true;
             }
-            // User can update their own order (only quantity)
             if ($user && $order && $user->role === 'user' && $order->user_id === $user->id) {
-                // Optionally, you can check that only 'quantity' is being updated here
                 return true;
             }
-            // Employee cannot update
             return false;
         }
 
@@ -40,21 +36,23 @@ class OrderRequest extends FormRequest
 
     public function rules()
     {
-        $rules = [
-            'product_id' => 'required|exists:products,id',
-            'date' => 'required|date',
-            'quantity' => 'required|integer|min:1',
-        ];
-
         if ($this->isMethod('post')) {
-            $rules['user_id'] = 'required|exists:users,id';
+            return [
+                'user_id' => 'required|exists:users,id',
+                'product_id' => 'required|exists:products,id',
+                'date' => 'required|date',
+                'quantity' => 'required|integer|min:1',
+            ];
+        } else { // PUT or PATCH
+            return [
+                'employee_id' => 'sometimes|nullable|exists:users,id',
+                'status' => 'sometimes|nullable|in:pending,shipped,delivered',
+                'is_assigned' => 'sometimes|nullable|boolean',
+                'quantity' => 'sometimes|integer|min:1',
+                'date' => 'sometimes|date',
+                'product_id' => 'sometimes|exists:products,id',
+            ];
         }
-        if ($this->isMethod('put') || $this->isMethod('patch')) {
-            $rules['employee_id'] = 'nullable|exists:users,id';
-            $rules['status'] = 'nullable|in:pending,shipped,delivered';
-            $rules['is_assigned'] = 'nullable|boolean';
-        }
-        return $rules;
     }
 
     public function messages()

@@ -40,6 +40,11 @@ class OrderService
 
     public function update(Order $order, array $data)
     {
+        // Set is_assigned based on employee_id
+        if (array_key_exists('employee_id', $data)) {
+            $data['is_assigned'] = !empty($data['employee_id']) ? true : false;
+        }
+
         return DB::transaction(function () use ($order, $data) {
             // If quantity is being updated, adjust product stock
             if (isset($data['quantity'])) {

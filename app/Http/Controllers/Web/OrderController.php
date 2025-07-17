@@ -75,15 +75,34 @@ class OrderController extends Controller
     public function update(OrderRequest $request, Order $order)
     {
         $user = auth()->user();
+        Log::info('Order update called', [
+            'user_id' => $user->id,
+            'role' => $user->role,
+            'order_id' => $order->id,
+            'request_data' => $request->all()
+        ]);
         if ($user->role !== 'admin' && $order->user_id !== $user->id) {
             abort(403, 'Unauthorized');
         }
         try {
-            $order = $this->service->update($order, $request->validated());
+            $validated = $request->validated();
+            Log::info('Order update validated data', [
+                'validated' => $validated
+            ]);
+            $order = $this->service->update($order, $validated);
+            Log::info('Order updated successfully', [
+                'order_id' => $order->id
+            ]);
             return redirect()->route('orders.index')->with('success', 'Order updated successfully.');
         } catch (\Exception $e) {
-            // Show error on the edit page and keep the input
-            return back()->withErrors(['quantity' => $e->getMessage()])->withInput();
+            Log::error('Order update failed', [
+                'order_id' => $order->id,
+                'error' => $e->getMessage()
+            ]);
+            return back()
+                ->withErrors(['error' => 'Failed to update order: ' . $e->getMessage()])
+                ->withInput()
+                ->with('assign_modal_order_id', $order->id);
         }
     }
 

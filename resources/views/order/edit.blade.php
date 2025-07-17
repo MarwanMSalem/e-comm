@@ -32,7 +32,7 @@
                 @if(auth()->user()->role === 'admin')
                 <div class="mb-3">
                     <label class="form-label">Assigned Employee</label>
-                    <select name="employee_id" class="form-select">
+                    <select name="employee_id" class="form-select" id="employeeSelect">
                         <option value="">Select Employee</option>
                         @foreach($employees as $employee)
                             <option value="{{ $employee->id }}" {{ $order->employee_id == $employee->id ? 'selected' : '' }}>
@@ -40,7 +40,17 @@
                             </option>
                         @endforeach
                     </select>
+                    <input type="hidden" name="is_assigned" id="isAssignedInput" value="{{ $order->employee_id ? 1 : 0 }}">
                 </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        var select = document.getElementById('employeeSelect');
+                        var isAssigned = document.getElementById('isAssignedInput');
+                        select.addEventListener('change', function () {
+                            isAssigned.value = select.value ? 1 : 0;
+                        });
+                    });
+                </script>
                 @else
                 <div class="mb-3">
                     <label class="form-label">Assigned Employee</label>

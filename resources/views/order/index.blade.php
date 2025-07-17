@@ -59,7 +59,7 @@
                         <!-- Assign Employee Button -->
                         <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#assignModal{{ $order->id }}">Assign</button>
                         <!-- Edit Button -->
-                        <a href="{{ route('orders.edit', $order) }}" class="btn btn-sm btn-warning">Edit</a>
+                        {{-- <a href="{{ route('orders.edit', $order) }}" class="btn btn-sm btn-warning">Edit</a> --}}
                         <!-- Delete Button -->
                         <form action="{{ route('orders.destroy', $order) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this order?');">
                             @csrf
@@ -137,4 +137,13 @@
         {{ $orders->withQueryString()->links() }}
     </div>
 </div>
+
+@if ($errors->any() && session('assign_modal_order_id'))
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var modal = new bootstrap.Modal(document.getElementById('assignModal{{ session('assign_modal_order_id') }}'));
+        modal.show();
+    });
+</script>
+@endif
 @endsection
