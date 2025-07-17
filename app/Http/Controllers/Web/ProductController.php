@@ -20,13 +20,12 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = $this->service->getAll($request->query());
-        return response()->json($products);
+        return view('product.index', compact('products'));
     }
 
-    public function show($id)
+    public function show(Product $product)
     {
-        $product = $this->service->getById($id);
-        return response()->json($product);
+        return view('product.show', compact('product'));
     }
 
     public function store(ProductRequest $request)
@@ -35,10 +34,22 @@ class ProductController extends Controller
         return response()->json($product, 201);
     }
 
+    public function edit(Product $product)
+    {
+        // Only admin can access
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
+        return view('product.edit', compact('product'));
+    }
+
     public function update(ProductRequest $request, Product $product)
     {
-        $product = $this->service->update($product, $request->validated());
-        return response()->json($product);
+        if (auth()->user()->role !== 'admin') {
+            abort(403, 'Unauthorized');
+        }
+        $this->service->update($product, $request->validated());
+        return redirect()->route('products.index')->with('success', 'Product updated successfully.');
     }
 
     public function destroy(Product $product)

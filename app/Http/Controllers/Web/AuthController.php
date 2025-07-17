@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -33,13 +32,11 @@ class AuthController extends Controller
             'role' => 'user',
         ]);
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Log the user in using session
+        auth()->login($user);
 
-        return response()->json([
-            'message' => 'Registration successful.',
-            'user' => $user,
-            'token' => $token,
-        ], 201);
+        // Redirect to home page
+        return redirect()->route('home');
     }
 
     public function login(Request $request)
@@ -56,26 +53,26 @@ class AuthController extends Controller
         $user = User::where('email', $validated['email'])->first();
 
         if (! $user || ! Hash::check($validated['password'], $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+            return back()->withErrors(['email' => 'The provided credentials are incorrect.'])->withInput();
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Log the user in using session
+        auth()->login($user);
 
-        return response()->json([
-            'message' => 'Login successful.',
-            'user' => $user,
-            'token' => $token,
-        ]);
+        // Redirect to home page
+        return redirect()->route('home');
     }
 
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
+        // For API tokens (if you use them)
+        if ($request->user()) {
+            $request->user()->tokens()->delete();
+        }
+        // Log out from session
+        auth()->logout();
 
-        return response()->json([
-            'message' => 'Logged out successfully.'
-        ]);
+        // Redirect to login page
+        return redirect()->route('web.login');
     }
 }

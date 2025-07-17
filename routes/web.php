@@ -1,18 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
 use App\Http\Controllers\Web\ProductController as WebProductController;
 use App\Http\Controllers\Web\OrderController as WebOrderController;
 use App\Http\Controllers\Web\UserController as WebUserController;
 use App\Http\Controllers\Web\AuthController as WebAuthController;
 
-// Home route (already present)
+// Home route
 Route::get('/', function () {
     return view('welcome');
 });
 
-// Register and login routes
+// Register and login forms (GET)
 Route::get('web/register', function () {
     return view('auth.register');
 })->name('web.register');
@@ -21,29 +20,24 @@ Route::get('web/login', function () {
     return view('auth.login');
 })->name('web.login');
 
-// Authentication routes
-// Route::post('web/register', [WebAuthController::class, 'register']);
-// Route::post('web/login', [WebAuthController::class, 'login']);
-// Route::post('web/logout', [WebAuthController::class, 'logout'])->middleware('auth:sanctum');
+// Register and login actions (POST)
+Route::post('web/register', [WebAuthController::class, 'register'])->name('web.register.submit');
+Route::post('web/login', [WebAuthController::class, 'login'])->name('web.login.submit');
+Route::post('web/logout', [WebAuthController::class, 'logout'])->middleware('auth:sanctum')->name('web.logout');
 
-Route::middleware('auth:sanctum')->prefix('web')->group(function () {
-    // Products
-    Route::get('products', [WebProductController::class, 'index']);
-    Route::get('products/{id}', [WebProductController::class, 'show']);
-    Route::post('products', [WebProductController::class, 'store']);
-    Route::put('products/{product}', [WebProductController::class, 'update']);
-    Route::delete('products/{product}', [WebProductController::class, 'destroy']);
+// Public product views
+Route::get('products', [WebProductController::class, 'index'])->name('products.index');
+Route::get('products/{product}', [WebProductController::class, 'show'])->name('products.show');
 
-    // Orders
-    Route::get('orders', [WebOrderController::class, 'index']);
-    Route::get('orders/my', [WebOrderController::class, 'myOrders']);
-    Route::get('orders/{id}', [WebOrderController::class, 'show']);
-    Route::post('orders', [WebOrderController::class, 'store']);
-    Route::put('orders/{order}', [WebOrderController::class, 'update']);
-    Route::delete('orders/{order}', [WebOrderController::class, 'destroy']);
-
-    // Users
-    Route::get('users', [WebUserController::class, 'index']);
-    Route::get('users/{id}', [WebUserController::class, 'show']);
-    Route::put('users/{user}', [WebUserController::class, 'update']);
+// Admin-only product edit/update (must be authenticated and admin)
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::get('products/{product}/edit', [WebProductController::class, 'edit'])->name('products.edit');
+    Route::put('products/{product}', [WebProductController::class, 'update'])->name('products.update');
 });
+
+// Home route
+Route::get('/home', function () {
+    return view('home');
+})->name('home')->middleware('auth:sanctum');
+
+// (Optional) Other web routes for orders/users can be added here, following the same pattern.
