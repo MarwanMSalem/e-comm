@@ -28,4 +28,9 @@ class UserService
     {
         return $this->repo->update($user, $data);
     }
+
+    public function create(array $data)
+    {
+        return $this->repo->create($data);
+    }
 }

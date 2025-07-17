@@ -21,4 +21,9 @@ class UserRepository
         $user->update($data);
         return $user;
     }
+
+    public function create(array $data)
+    {
+        return User::create($data);
+    }
 }

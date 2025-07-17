@@ -48,5 +48,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('orders/{order}', [WebOrderController::class, 'update'])->name('orders.update');
     Route::delete('orders/{order}', [WebOrderController::class, 'destroy'])->name('orders.destroy');
     Route::post('products/{product}/order', [\App\Http\Controllers\Web\OrderController::class, 'storeFromProduct'])->name('orders.store.from_product');
-    // ... other order routes as needed ...
+    // users routes
+    Route::get('users', [\App\Http\Controllers\Web\UserController::class, 'adminIndex'])->name('users.index');
+    Route::put('users/{user}', [\App\Http\Controllers\Web\UserController::class, 'adminUpdate'])->name('users.update');
+    Route::delete('users/{user}', [\App\Http\Controllers\Web\UserController::class, 'destroy'])->name('users.destroy');
+    Route::post('users', [\App\Http\Controllers\Web\UserController::class, 'store'])->name('users.store');
 });
