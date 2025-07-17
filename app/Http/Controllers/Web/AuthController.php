@@ -69,8 +69,12 @@ class AuthController extends Controller
         if ($request->user()) {
             $request->user()->tokens()->delete();
         }
-        // Log out from session
-        auth()->logout();
+        // Log out from session (force web guard)
+        auth('web')->logout();
+
+        // Invalidate the session and regenerate token for security
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         // Redirect to login page
         return redirect()->route('web.login');

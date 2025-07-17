@@ -23,7 +23,7 @@ Route::get('web/login', function () {
 // Register and login actions (POST)
 Route::post('web/register', [WebAuthController::class, 'register'])->name('web.register.submit');
 Route::post('web/login', [WebAuthController::class, 'login'])->name('web.login.submit');
-Route::post('web/logout', [WebAuthController::class, 'logout'])->middleware('auth:sanctum')->name('web.logout');
+Route::post('web/logout', [WebAuthController::class, 'logout'])->middleware('auth')->name('web.logout');
 
 // Public product views
 Route::get('products', [WebProductController::class, 'index'])->name('products.index');

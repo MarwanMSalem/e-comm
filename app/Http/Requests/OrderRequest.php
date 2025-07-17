@@ -9,14 +9,27 @@ class OrderRequest extends FormRequest
 {
     public function authorize()
     {
-        // Only admin can assign employee or update status, others can create
         $user = auth()->user();
+        $order = $this->route('order'); // This will be the Order model instance
+
         if ($this->isMethod('post')) {
             return $user !== null;
         }
+
         if ($this->isMethod('put') || $this->isMethod('patch')) {
-            return $user && $user->role === 'admin';
+            // Admin can update any order
+            if ($user && $user->role === 'admin') {
+                return true;
+            }
+            // User can update their own order (only quantity)
+            if ($user && $order && $user->role === 'user' && $order->user_id === $user->id) {
+                // Optionally, you can check that only 'quantity' is being updated here
+                return true;
+            }
+            // Employee cannot update
+            return false;
         }
+
         return false;
     }
 

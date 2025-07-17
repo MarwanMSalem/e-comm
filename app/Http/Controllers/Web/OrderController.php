@@ -73,25 +73,43 @@ class OrderController extends Controller
 
     public function update(OrderRequest $request, Order $order)
     {
-        $user = $request->user();
+        $user = auth()->user();
         if ($user->role !== 'admin' && $order->user_id !== $user->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            abort(403, 'Unauthorized');
         }
         try {
             $order = $this->service->update($order, $request->validated());
-            return response()->json($order);
+            return redirect()->route('orders.index')->with('success', 'Order updated successfully.');
         } catch (\Exception $e) {
-            return response()->json(['error' => $e->getMessage()], 400);
+            // Show error on the edit page and keep the input
+            return back()->withErrors(['quantity' => $e->getMessage()])->withInput();
         }
     }
 
     public function destroy(Request $request, Order $order)
     {
-        $user = $request->user();
+        $user = auth()->user();
         if ($user->role !== 'admin' && $order->user_id !== $user->id) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            abort(403, 'Unauthorized');
         }
         $this->service->delete($order);
-        return response()->json(['message' => 'Order deleted successfully.']);
+        return redirect()->route('orders.index')->with('success', 'Order deleted successfully.');
+    }
+
+    public function edit(Order $order)
+    {
+        $user = auth()->user();
+
+        // Only admin or the user who created the order can edit
+        if ($user->role !== 'admin' && $order->user_id !== $user->id) {
+            abort(403, 'Unauthorized');
+        }
+
+        // For admin, pass employees for assignment
+        $employees = $user->role === 'admin'
+            ? \App\Models\User::where('role', 'employee')->get()
+            : collect();
+
+        return view('order.edit', compact('order', 'employees'));
     }
 }
