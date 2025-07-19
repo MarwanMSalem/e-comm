@@ -1,0 +1,41 @@
+services:
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: ecomm_php
+    volumes:
+      - ./:/var/www/html:cached   # bind mount for live code edits
+    env_file:
+      - .env
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: ecomm_nginx
+    ports:
+      - "8000:80"          # host:container
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+
+  db:
+    image: mysql:8.4
+    container_name: ecomm_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ecomm
+      MYSQL_USER: ecomm
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - ecomm_db_data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/my.cnf:ro
+    ports:
+      - "3307:3306"        # avoid clashing w/local MySQL; adjust as desired
+
+volumes:
+  ecomm_db_data:
